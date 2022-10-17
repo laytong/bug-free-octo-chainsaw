@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/beige.css">
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/monokai.css">
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+					<h2>Why do we federate?</h2><img data-src="./images/apollo-logo.webp" height="200">
+				</section>
+				<section>
+					<section>
+						<h2>The before times</h2>
+						<img alt="rest api diagram" data-src="./images/REST.png">
+					</section>
+					<section>
+						<h2>The monolith</h2>
+						<img alt="GQL Monolith diagram" data-src="./images/Monolith.png">
+						<aside class="notes">
+							<h3>Main advantages of basic federation</h3>
+							<ul>
+								<li>Single point of access for our clients - simplicity</li>
+								<li>Also access multiple data sources/services within the same query</li>
+								<li>Central catalogue of all data available</li>
+								<li>Minimise our implementation costs as graph implementation work isn't duplicated</li>
+								<li>Simplifies access control into a single place i.e. the gateway</li>
+							</ul>
+							<h3>Disadvantages</h3>
+							<ul>
+								<li>Not a scalable architecture</li>
+								<li>Responsibility for definition and implementation of the graph is hard to divide</li>
+								<li>Single point of failure?</li>
+							</ul>
+						</aside>
+					</section>
+					<section>
+						<h2>The Supergraph</h2>
+						<img alt="Supergraph diagram" data-src="./images/Supergraph.png">
+						<aside class="notes">
+							<p>Pros</p>
+							<ul>
+								<li>Separation of concerns, Makes our API "evolvable". We don't </li>
+								<li>Your subgraph mostly just defines types and fields that it is responsible for</li>
+								<li>But it can also start defining its own caching strategies to reduce the load on underlying rest apis</li>
+								<li>DX - If your developers need to extend what a particular entity can return, That can do it from within their own graph first, rather than waiting for the graph to support it.</li>
+							</ul>
+						</aside>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h2>How can we harness this better?</h2>
+						<ul>
+							<li class="fragment">"Think in graphs"</li>
+							<li class="fragment">Model our client experiences more closely</li>
+							<li class="fragment">Define conventions and standards</li>
+						</ul>
+						<aside class="notes">
+							<ul>
+								<li>We need to get back to "thinking in graphs", not making our graphs "REST-y". Avoid that CRUD pattern</li>
+								<li>Our data should not be a representation of our databases/what our rest apis have/Not just a wrapper around REST</li>
+								<li>Use domain driven design for our subgraphs to understand how different entities are related and the experiences our clients want to have</li>
+								<li>Just because something is a collection in rest, doesn't mean it needs to exist in our subgraph</li>
+								<li>We should look to define our entities and the connections between them and design our schemas for behaviours/experiences</li>
+								<li>Linting, naming conventions, nullability, abstract types, deprecation strategies</li>
+								<li>How do we name our queries/entities and what patterns do we follow for update mutations</li>
+							</ul>
+						</aside>
+					</section>
+					<section>
+						<pre>
+							<code class="language-graphql">
+query GetStudent($studentId: ID!) {
+	getStudent(id: $studentId) {
+		firstName
+		lastName
+		college {
+			name
+		}
+	}
+	getEmployee(role: "dean", collegeId: 32) {
+		name
+		email
+	}
+}
+							</code>
+						</pre>
+					</section>
+					<section>
+						<pre >
+							<code class="language-graphql">
+query GetStudent($studentId: ID!) {
+	getStudent(id: $studentId) {
+		fullName
+		college {
+			name
+			dean {
+				name
+				email
+			}
+		}
+	}
+}
+							</code>
+						</pre>
+					</section>
+					<section>
+						<h2>Mutations</h2>
+						<pre>
+							<code class="language-graphql">
+input UpdateVehicleInformationInput {
+	vehicleName: string
+	drivers: [Driver!]
+	assetGroups: [AssetGroup!]
+}
+
+type Mutation {
+	updateVehicleInformation($newData: UpdateVehicleInformationInput!) updateVehiclePayload!
+}
+
+							</code>
+						</pre>
+					</section>
+					<section>
+						<pre>
+							<code class="language-graphql">
+input TransferOrganisationInput {
+	vehicle: ID!
+	assetGroups: ID!
+}
+
+input SetVehicleNameInput {
+	vehicleID: ID!
+	name: String!
+}
+
+type Mutation {
+	addVehicleToAssetGroup(input: TransferOrganisationInput!) AddVehicleToAssetGroupPayload!
+	removeVehicleFromAssetGroup(input: TransferOrganisationInput!) RemoveVehicleFromAssetGroupPayload!
+	setVehicleName(input: SetVehicleNameInput!) Vehicle!
+}
+							</code>
+						</pre>
+						<aside class="notes">
+							<ul>
+								<li>What if we flipped that convention and thought about the interactions we are having?</li>
+								<li>Reduce the amount of logic we need on the client. Have the schema clearly tell us what is possible and how to do it.</li>
+								<li>And if you want to get super crazy, what if it returned a server rendered component?</li>
+							</ul>
+						</aside>
+					</section>
+					<section>
+						<pre>
+							<code class="language-graphql">
+query getAccountCurrentUser($vin: String!){
+	canAssignRole
+	dueForInsuranceRenewal
+}
+							</code>
+						</pre>
+						<aside class="notes">
+							<ul>
+								<li>We can also do this on the querying side</li>
+								<li>What if we moved the logic for things to the server side?</li>
+								<li>Teams can define related logic in their own subgraphs by extending user</li>
+								<li>But keeping all the ownership of that logic with the domain experts</li>
+								<li>Now anywhere in the UI where we are trying to make decisions based on permissions or some business logic, we don't need to keep it on the client side across multiple micro apps</li>
+								<li>And the schema is telling us what we know about our data</li>
+							</ul>
+						</aside>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h2>How should we do this?</h2>
+						<img data-src="./images/core-entities.png" class="stretch">
+					</section>
+					<section>
+						<img data-src="./images/Venn.png" class="stretch">
+					</section>
+					<section>
+						<img data-src="./images/pretty-subgraph.png" class="stretch">
+					</section>
+					<section>
+						<h2>How should we do this?</h2>
+						<ul>
+							<li class="fragment">Start thoughtfully creating our entities and their connections</li>
+							<li class="fragment">Let our real world business cases define this</li>
+							<li class="fragment">Deprecate the old subgraph methods as we improve</li>
+						</ul>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h2>What's new?</h2>
+					</section>
+					<section>
+						<h2>Federation V2</h2>
+						<ul>
+							<li>Value type freedom</li>
+							<li><code>Subgraph name</code></li>
+							<li><code>@defer</code></li>
+						</ul>
+					</section>
+					<section>
+						<h2>Apollo Router</h2>
+						<ul>
+							<li>Can make smarter queries when it queries our subgraphs</li>
+							<li>Implemented in rust</li>
+							<li>Built in Open Telemetry (data dog compatibility and more)</li>
+							<li>Built in support for persisted queries</li>
+							<li>Built in sandbox support for DX to write queries (No apollo account required)</li>
+						</ul>
+					</section>
+				</section>
+			</div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+			});
+		</script>
+	</body>
+</html>
