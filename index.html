@@ -17,7 +17,7 @@
 		<div class="reveal">
 			<div class="slides">
 				<section>
-					<h2>Why do we federate?</h2><img data-src="./images/apollo-logo.webp" height="200">
+					<h2>Why do we federate?</h2><img data-src="images/apollo-logo.webp" height="200">
 					<aside class="notes">
 						<p>Hello everyone</p>
 						<p>For many of us that joined Rivian within the last 18 months or so you may have come from a background where you haven't used GraphQL before, or you're new to federation</p>
@@ -27,7 +27,7 @@
 				<section>
 					<section>
 						<h2>The before times</h2>
-						<img alt="rest api diagram" data-src="./images/REST.png">
+						<img alt="rest api diagram" data-src="images/REST.png">
 						<aside class="notes">
 							<p>We're all familiar with the before times, in our case a collection of micro apps and a series of apis to contact</p>
 							<ul>
@@ -39,7 +39,7 @@
 					</section>
 					<section>
 						<h2>The monolith</h2>
-						<img alt="GQL Monolith diagram" data-src="./images/Monolith.png">
+						<img alt="GQL Monolith diagram" data-src="images/Monolith.png">
 						<aside class="notes">
 							<h3>Main advantages of graphql federation</h3>
 							<p>So this was the first logical step with GraphQL. We create a graphQL server, giving us a single point of access for our clients</p>
@@ -59,7 +59,7 @@
 					</section>
 					<section>
 						<h2>The Supergraph</h2>
-						<img alt="Supergraph diagram" data-src="./images/Supergraph.png">
+						<img alt="Supergraph diagram" data-src="images/Supergraph.png">
 						<aside class="notes">
 							<p>Pros</p>
 							<ul>
@@ -84,7 +84,7 @@
 					</section>
 					<section>
 						<h2>Think in graphs</h2>
-						<img data-src="./images/core-entities.png" class="stretch">
+						<img data-src="images/core-entities.png" class="stretch">
 						<aside class="notes">
 							<p>We must intentionally design schemas in an abstract, demand-oriented way</p>
 							<p>Think more like the client. How do these pieces of data fit together in the real world?</p>
@@ -195,7 +195,7 @@ query getAccountCurrentUser($vin: String!){
 					</section>
 					<section>
 						<h3>Migrating to an experience oriented graph</h3>
-						<img data-src="./images/domain-to-experience.png" class="stretch">
+						<img data-src="images/domain-to-experience.png" class="stretch">
 						<aside class="notes">
 							<p>This is a pretty common example of us getting some results from our graph today</p>
 							<p>We get the raw data for the most part, and each place in the UI that we use a hotel listing, we need to piece together the business logic</p>
@@ -204,7 +204,7 @@ query getAccountCurrentUser($vin: String!){
 						</aside>
 					</section>
 					<section>
-						<img data-src="./images/experience-to-component.png" class="stretch">
+						<img data-src="images/experience-to-component.png" class="stretch">
 						<aside class="notes">
 							<p>Here's how that might manifest in the front end</p>
 						</aside>
@@ -212,13 +212,13 @@ query getAccountCurrentUser($vin: String!){
 				</section>
 				<section>
 					<section>
-						<img data-src="./images/Venn.png" class="stretch">
+						<img data-src="images/Venn.png" class="stretch">
 						<aside class="notes">
 							<p>At the moment we need to increase the overlap here between our domain experts and our graph experts. Ideally these circles almost completely overlap.</p>
 						</aside>
 					</section>
 					<section>
-						<img data-src="./images/pretty-subgraph.png" class="stretch">
+						<img data-src="images/pretty-subgraph.png" class="stretch">
 						<aside class="notes">
 							This is the pretty future that we are hoping for.
 							And while GraphQL offers the promise of taking a client-driven approach to API design and development, it provides no inherent guarantee that any given schema will lend itself to real client use cases.
@@ -227,7 +227,7 @@ query getAccountCurrentUser($vin: String!){
 					</section>
 					<section data-auto-animate>
 						<h2 data-id="title">How should we do this?</h2>
-						<img data-src="./images/api.jpg" data-id="content">
+						<img data-src="images/api.jpg" data-id="content">
 					</section>
 					<section data-auto-animate>
 						<h2 data-id="title">How should we do this?</h2>
