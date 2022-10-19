@@ -218,21 +218,27 @@ query getAccountCurrentUser($vin: String!){
 						</aside>
 					</section>
 					<section>
-						<h2>How should we do this?</h2>
-						<ul>
-							<li class="fragment">Start thoughtfully creating our entities and their connections</li>
+						<img data-src="./images/pretty-subgraph.png" class="stretch">
+						<aside class="notes">
+							This is the pretty future that we are hoping for.
+							And while GraphQL offers the promise of taking a client-driven approach to API design and development, it provides no inherent guarantee that any given schema will lend itself to real client use cases.
+							https://www.apollographql.com/docs/enterprise-guide/federated-schema-design
+						</aside>
+					</section>
+					<section data-auto-animate>
+						<h2 data-id="title">How should we do this?</h2>
+						<img data-src="./images/api.jpg" data-id="content">
+					</section>
+					<section data-auto-animate>
+						<h2 data-id="title">How should we do this?</h2>
+						<ul data-id="content">
+							<li>Start thoughtfully creating our entities and their connections</li>
 							<li class="fragment">Let our real world business cases define this</li>
 							<li class="fragment">Deprecate the old subgraph methods as we improve</li>
 							<li class="fragment">Remember that the greatest strength of our subgraph architecture is that we can use these ideas only when they make sense</li>
 						</ul>
 						<aside class="notes">
 							If you're standing up a service or have a time crunch and haven't got time to get your entities and interactions right, Then don't. Build it, deprecate it. evolve it.
-						</aside>
-					</section>
-					<section>
-						<img data-src="./images/pretty-subgraph.png" class="stretch">
-						<aside class="notes">
-							This is the pretty future that we are hoping for
 						</aside>
 					</section>
 				</section>
