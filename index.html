@@ -18,22 +18,35 @@
 			<div class="slides">
 				<section>
 					<h2>Why do we federate?</h2><img data-src="./images/apollo-logo.webp" height="200">
+					<aside class="notes">
+						<p>Hello everyone</p>
+						<p>For many of us that joined Rivian within the last 18 months or so you may have come from a background where you haven't used GraphQL before, or you're new to federation</p>
+						<p>So first I thought i'd spend some time reminding us why we're using GQL, and more specifically federation.</p>
+					</aside>
 				</section>
 				<section>
 					<section>
 						<h2>The before times</h2>
 						<img alt="rest api diagram" data-src="./images/REST.png">
+						<aside class="notes">
+							<p>We're all familiar with the before times, in our case a collection of micro apps and a series of apis to contact</p>
+							<ul>
+								<li>Multiple endpoints</li>
+								<li>Over-fetching and under-fetching</li>
+								<li>Multiple round trips to get hierarchical data</li>
+							</ul>
+						</aside>
 					</section>
 					<section>
 						<h2>The monolith</h2>
 						<img alt="GQL Monolith diagram" data-src="./images/Monolith.png">
 						<aside class="notes">
-							<h3>Main advantages of basic federation</h3>
+							<h3>Main advantages of graphql federation</h3>
+							<p>So this was the first logical step with GraphQL. We create a graphQL server, giving us a single point of access for our clients</p>
 							<ul>
 								<li>Single point of access for our clients - simplicity</li>
 								<li>Also access multiple data sources/services within the same query</li>
-								<li>Central catalogue of all data available</li>
-								<li>Minimise our implementation costs as graph implementation work isn't duplicated</li>
+								<li>Introspection provides a central catalogue of all data available</li>
 								<li>Simplifies access control into a single place i.e. the gateway</li>
 							</ul>
 							<h3>Disadvantages</h3>
@@ -50,75 +63,56 @@
 						<aside class="notes">
 							<p>Pros</p>
 							<ul>
-								<li>Separation of concerns, Makes our API "evolvable". We don't </li>
-								<li>Your subgraph mostly just defines types and fields that it is responsible for</li>
-								<li>But it can also start defining its own caching strategies to reduce the load on underlying rest apis</li>
+								<li>Minimise our implementation costs as graph implementation work isn't duplicated. We can reuse the graphs of other teams</li>
+								<li>Separation of concerns, Makes our API "evolvable". We don't have to be all in, and we don't have to do massive v1/v2/v3 api migrations like we do with Rest. </li>
+								<li>We can define our own caching strategies to reduce the load on underlying rest apis and optimise how we fetch from those APIs, whilst staying as a single trip experience</li>
 								<li>DX - If your developers need to extend what a particular entity can return, That can do it from within their own graph first, rather than waiting for the graph to support it.</li>
 							</ul>
+							<p>So we're done right, we're doing an awesome job and we're ahead of they curve by adopting GQL federation right?</p>
 						</aside>
 					</section>
 				</section>
 				<section>
 					<section>
 						<h2>How can we harness this better?</h2>
-						<ul>
-							<li class="fragment">"Think in graphs"</li>
-							<li class="fragment">Model our client experiences more closely</li>
-							<li class="fragment">Define conventions and standards</li>
-						</ul>
+						<div class="fragment">"Think in graphs"</div>
 						<aside class="notes">
-							<ul>
-								<li>We need to get back to "thinking in graphs", not making our graphs "REST-y". Avoid that CRUD pattern</li>
-								<li>Our data should not be a representation of our databases/what our rest apis have/Not just a wrapper around REST</li>
-								<li>Use domain driven design for our subgraphs to understand how different entities are related and the experiences our clients want to have</li>
-								<li>Just because something is a collection in rest, doesn't mean it needs to exist in our subgraph</li>
-								<li>We should look to define our entities and the connections between them and design our schemas for behaviours/experiences</li>
-								<li>Linting, naming conventions, nullability, abstract types, deprecation strategies</li>
-								<li>How do we name our queries/entities and what patterns do we follow for update mutations</li>
-							</ul>
+							<h3>Think in graphs</h3>
+							<p>We need to get back to "thinking in graphs", not making our graphs "REST-y". Avoid the CRUD pattern</p>
+							<p>Our data should not just continue to be a representation of our databases/rest apis have</p>
 						</aside>
 					</section>
 					<section>
-						<pre>
-							<code class="language-graphql">
-query GetStudent($studentId: ID!) {
-	getStudent(id: $studentId) {
-		firstName
-		lastName
-		college {
-			name
-		}
-	}
-	getEmployee(role: "dean", collegeId: 32) {
-		name
-		email
-	}
-}
-							</code>
-						</pre>
+						<h2>Think in graphs</h2>
+						<img data-src="./images/core-entities.png" class="stretch">
+						<aside class="notes">
+							<p>We must intentionally design schemas in an abstract, demand-oriented way</p>
+							<p>Think more like the client. How do these pieces of data fit together in the real world?</p>
+							<p>How does the client want to interact with us?</p>
+							<a href="https://khalilstemmler.com/articles/graphql/ddd/schema-design/">Domain driven design</a>
+							<p>This is a start on these for our organization.</p>
+							<p>As we keep expanding out we can keep extending and defining the relationships between our data</p>
+							<p>But the subteam most familiar with that domain owns their own subgraph</p>
+							<p>Evolution of the graph is a feature, not a bug</p>
+
+						</aside>
 					</section>
 					<section>
-						<pre >
-							<code class="language-graphql">
-query GetStudent($studentId: ID!) {
-	getStudent(id: $studentId) {
-		fullName
-		college {
-			name
-			dean {
-				name
-				email
-			}
-		}
-	}
-}
-							</code>
-						</pre>
+						<h2>How can we harness this better?</h2>
+						<ul>
+							<li>"Think in graphs"</li>
+							<li class="fragment">Conventions and standards</li>
+						</ul>
+						<aside class="notes">
+							<h3>Conventions and standards</h3>
+							<p>Linting, naming conventions, philosophy on nullability, abstract types, deprecation strategies</p>
+							<p>How do we name our queries/entities and what patterns do we follow for update mutations</p>
+						</aside>
 					</section>
 					<section>
-						<h2>Mutations</h2>
+						<h3>Mutations</h3>
 						<pre>
-							<code class="language-graphql">
+							<code class="language-graphql" data-trim>
 input UpdateVehicleInformationInput {
 	vehicleName: string
 	drivers: [Driver!]
@@ -131,10 +125,14 @@ type Mutation {
 
 							</code>
 						</pre>
+						<aside class="notes">
+							<p>Here's a simple example of how a lot of our mutations look today</p>
+							<p>We create loose inputs with nullable fields and essentially imitate patch endpoints for updating and interacting with our data</p>
+						</aside>
 					</section>
 					<section>
 						<pre>
-							<code class="language-graphql">
+							<code class="language-graphql" data-trim>
 input TransferOrganisationInput {
 	vehicle: ID!
 	assetGroups: ID!
@@ -154,9 +152,10 @@ type Mutation {
 						</pre>
 						<aside class="notes">
 							<ul>
-								<li>What if we flipped that convention and thought about the interactions we are having?</li>
+								<li>What if we flipped that convention and thought about the interactions we are having first?</li>
+								<li>We should offer really specific endpoints for partial updates. And reduce our reliance on non-nullable fields</li>
+								<li>Remember, you can send multiple mutations in the same request</li>
 								<li>Reduce the amount of logic we need on the client. Have the schema clearly tell us what is possible and how to do it.</li>
-								<li>And if you want to get super crazy, what if it returned a server rendered component?</li>
 							</ul>
 						</aside>
 					</section>
@@ -180,17 +179,43 @@ query getAccountCurrentUser($vin: String!){
 							</ul>
 						</aside>
 					</section>
+					<section>
+						<h2>How can we harness this better?</h2>
+						<ul>
+							<li>"Think in graphs"</li>
+							<li>Conventions and standards</li>
+							<li class="fragment">Model our client experiences more closely</li>
+						</ul>
+						<aside class="notes">
+							<p>Use domain driven design for our subgraphs to understand how different entities are related and the experiences our clients want to have</p>
+							<h3>Model our client experiences more closely</h3>
+							<p>We should look to define our entities and the connections between them and design our schemas for behaviours/experiences</p>
+							<p>Just because something is a collection in rest, doesn't mean it needs to exist in our subgraph</p>
+						</aside>
+					</section>
+					<section>
+						<h3>Migrating to an experience oriented graph</h3>
+						<img data-src="./images/domain-to-experience.png" class="stretch">
+						<aside class="notes">
+							<p>This is a pretty common example of us getting some results from our graph today</p>
+							<p>We get the raw data for the most part, and each place in the UI that we use a hotel listing, we need to piece together the business logic</p>
+							<p>What if what we returned was essentially just the props for our component?</p>
+							<p>What if within our subgraph we baked in internationalisation, we distill the raw data into what message we want to give to the user</p>
+						</aside>
+					</section>
+					<section>
+						<img data-src="./images/experience-to-component.png" class="stretch">
+						<aside class="notes">
+							<p>Here's how that might manifest in the front end</p>
+						</aside>
+					</section>
 				</section>
 				<section>
 					<section>
-						<h2>How should we do this?</h2>
-						<img data-src="./images/core-entities.png" class="stretch">
-					</section>
-					<section>
 						<img data-src="./images/Venn.png" class="stretch">
-					</section>
-					<section>
-						<img data-src="./images/pretty-subgraph.png" class="stretch">
+						<aside class="notes">
+							<p>At the moment we need to increase the overlap here between our domain experts and our graph experts. Ideally these circles almost completely overlap.</p>
+						</aside>
 					</section>
 					<section>
 						<h2>How should we do this?</h2>
@@ -198,7 +223,17 @@ query getAccountCurrentUser($vin: String!){
 							<li class="fragment">Start thoughtfully creating our entities and their connections</li>
 							<li class="fragment">Let our real world business cases define this</li>
 							<li class="fragment">Deprecate the old subgraph methods as we improve</li>
+							<li class="fragment">Remember that the greatest strength of our subgraph architecture is that we can use these ideas only when they make sense</li>
 						</ul>
+						<aside class="notes">
+							If you're standing up a service or have a time crunch and haven't got time to get your entities and interactions right, Then don't. Build it, deprecate it. evolve it.
+						</aside>
+					</section>
+					<section>
+						<img data-src="./images/pretty-subgraph.png" class="stretch">
+						<aside class="notes">
+							This is the pretty future that we are hoping for
+						</aside>
 					</section>
 				</section>
 				<section>
